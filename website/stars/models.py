@@ -1,4 +1,5 @@
 from django.db import models
+from images.models import Image
 from helpers.model_mixins import PublishedMixin
 
 
@@ -13,4 +14,4 @@ class Star(PublishedMixin, models.Model):
     gender = models.PositiveSmallIntegerField(blank=True, null=True, help_text='1- female, 2- male')
     homepage = models.URLField(blank=True)
 
-    poster = models.ImageField(upload_to='images', blank=True, help_text='main photo for this star')
+    poster = models.ForeignKey(Image, blank=True, help_text='main photo for this star')

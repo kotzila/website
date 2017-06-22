@@ -1,3 +1,7 @@
 from django.contrib import admin
+from stars.models import Star
 
-# Register your models here.
+
+@admin.register(Star)
+class StarAdmin(admin.ModelAdmin):
+    pass
