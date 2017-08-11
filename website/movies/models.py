@@ -6,23 +6,32 @@ from common.models import Genre, ProductionCompany, Country, KeyWord
 from stars.models import Star
 from images.models import Image
 from helpers.model_mixins import PublishedMixin
+from synchronizer.mixins import TmdbMovieSynchronizeMixin
 
 
-class Movie(PublishedMixin, models.Model):
+
+class Movie(TmdbMovieSynchronizeMixin, PublishedMixin, models.Model):
     title = models.CharField(max_length=128, help_text='Main title which will be shoved on website')
     # todo: create something like EnumField or create different table for this field(in last case use index)
     release_status = models.CharField(max_length=16)
-    release_date = models.DateField(blank=True)
+    release_date = models.DateField(blank=True, null=True)
 
     poster = models.ForeignKey(Image, blank=True, null=True,
                                on_delete=models.CASCADE,
                                help_text='main poster for this movie',
                                related_name='movie_poster')
-    images = models.ManyToManyField(Image, blank=True, null=True, related_name='movie_image')
+    images = models.ManyToManyField(Image, blank=True, related_name='movie_image')
     genres = models.ManyToManyField(Genre)
     production_companies = models.ManyToManyField(ProductionCompany, blank=True)
     production_countries = models.ManyToManyField(Country)
     keywords = models.ManyToManyField(KeyWord, blank=True)
+
+    tmdb_id = models.PositiveIntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return self.title
+
+
 
 
 class Info(models.Model):
@@ -30,36 +39,36 @@ class Info(models.Model):
     information about movie
     """
     movie = models.OneToOneField(Movie, primary_key=True, on_delete=models.CASCADE)
-    original_title = models.CharField(max_length=128, blank=True, help_text='Title in original language')
-    title_ua = models.CharField(max_length=128, blank=True)
-    title_ru = models.CharField(max_length=128, blank=True)
-    overview = models.TextField(blank=True)
-    overview_ua = models.TextField(blank=True)
+    original_title = models.CharField(max_length=128, blank=True, null=True, help_text='Title in original language')
+    overview = models.TextField(blank=True, null=True)
+    overview_ua = models.TextField(blank=True, null=True)
 
-    tagline = models.CharField(max_length=255, blank=True)
-    tmdb_id = models.PositiveIntegerField(blank=True, null=True)
+    tagline = models.CharField(max_length=255, blank=True, null=True)
+
     budget = models.PositiveIntegerField(null=True, blank=True, help_text='Total budget in dollars')
     revenue = models.PositiveIntegerField(null=True, blank=True, help_text='Total revenue in dollars')
     revenue_ua = models.PositiveIntegerField(null=True, blank=True, help_text='Revenue in Ukraine')
-    homepage = models.URLField(blank=True)
-    original_language = models.CharField(max_length=2, blank=True)
+    homepage = models.URLField(blank=True, null=True)
+    original_language = models.CharField(max_length=2, blank=True, null=True)
     runtime = models.PositiveIntegerField(blank=True, null=True, help_text='Runtime in minutes')
 
-    imdb_id = models.CharField(max_length=16, blank=True)
+    imdb_id = models.CharField(max_length=16, blank=True, null=True)
     tmdb_popularity = models.FloatField(blank=True, null=True, help_text='Popularity in themoviedb')
     popularity = models.FloatField(blank=True, null=True, help_text='Populatity in this website')
 
     vote_average = models.FloatField(blank=True, null=True)
-    vote_count = models.PositiveIntegerField(blank=True)
+    vote_count = models.PositiveIntegerField(blank=True, null=True)
+
+    translated = models.BooleanField(default=False)
 
 
 class Video(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     iso_3166_1 = models.CharField(max_length=2)
     iso_639_1 = models.CharField(max_length=2)
-    key = models.CharField(max_length=32)
-    site = models.CharField(max_length=32)
-    type = models.CharField(max_length=32)
+    key = models.CharField(max_length=64)
+    site = models.CharField(max_length=64)
+    type = models.CharField(max_length=64)
     size = models.PositiveIntegerField(blank=True, null=True)
     order = models.PositiveSmallIntegerField(default=999)
 
@@ -74,7 +83,7 @@ class Release(models.Model):
 class Credit(StatusModel, models.Model):
     STATUS = Choices('crew', 'cast')
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
-    star = models.ForeignKey(Star)
+    star = models.ForeignKey(Star, null=True, blank=True)
     # crew info
     department = models.CharField(max_length=64, blank=True)
     job = models.CharField(max_length=64, blank=True)

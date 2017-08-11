@@ -3,3 +3,6 @@ ipython==6.1.0
 psycopg2==2.6.1
 django-model-utils==3.0.0
 Pillow==4.1.1
+tmdbsimple==1.7.0
+django-querysetsequence==0.7.2
+django-autocomplete-light==3.2.9

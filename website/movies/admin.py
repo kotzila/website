@@ -1,5 +1,6 @@
 from django.contrib import admin
 from movies.models import Movie, Info, Video, Release, Credit
+from movies.forms import MovieForm
 
 
 class InfoInline(admin.StackedInline):
@@ -17,7 +18,19 @@ class CreditInline(admin.StackedInline):
     model = Credit
 
 
+
 @admin.register(Movie)
 class MovieAdmin(admin.ModelAdmin):
-    inlines = (InfoInline, VideoInline, ReleaseInline, CreditInline)
-    filter_horizontal = ('genres', 'images', 'production_companies', 'production_countries', 'keywords')
+    form = MovieForm
+    inlines = (InfoInline, VideoInline, ReleaseInline)
+    list_display = ('title', 'release_status',)
+    list_filter = ('release_status', )
+
+
+from .forms import VideoForm
+
+
+class VideoAdmin(admin.ModelAdmin):
+    form = VideoForm
+
+admin.site.register(Video, VideoAdmin)
