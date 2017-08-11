@@ -91,3 +91,5 @@ STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, '../media/')
 MEDIA_URL = '/media/'
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
