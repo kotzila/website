@@ -37,7 +37,8 @@ class MovieAdmin(admin.ModelAdmin):
     form = MovieForm
     inlines = (InfoInline, VideoInline, ReleaseInline)
     list_display = ('title', 'release_date', 'release_status', 'get_translated')
-    list_filter = ('release_status', 'info__translated', 'release_date')
+    list_filter = ('release_status', 'info__translated', 'release_date', 'production_countries')
+    search_fields = ('title', )
     actions = [tmdb_syncrhonise]
 
     def get_translated(self, obj):
