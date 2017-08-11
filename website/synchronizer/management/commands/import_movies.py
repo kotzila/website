@@ -1,14 +1,15 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.conf import settings
 from requests.exceptions import HTTPError
 import tmdbsimple as tmdb
-from synchronizer.contstans import LANG
+from synchronizer.contstans import LANG, RELEASE_STATUSES
 from images.models import Image
+from movies.models import Movie, Info
+from common.models import ProductionCompany, Country
 
 tmdb.API_KEY = settings.SECRET_TMDB_API_KEY
 
-from movies.models import Movie, Info, Release, Video
-from common.models import ProductionCompany, Country, KeyWord
+
 
 
 
@@ -29,7 +30,7 @@ def handle_info(tmdb_id):
         return
     # add main movie data
     main_data = {'title': response['title'], 'release_date': response['release_date'],
-                 'release_status': response['status'],
+                 'release_status': RELEASE_STATUSES.get(response['status'], response['status']),
                  'tmdb_id': response['id']}
     movie = Movie(**main_data)
     movie.save()

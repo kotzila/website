@@ -23,8 +23,12 @@ class CreditInline(admin.StackedInline):
 class MovieAdmin(admin.ModelAdmin):
     form = MovieForm
     inlines = (InfoInline, VideoInline, ReleaseInline)
-    list_display = ('title', 'release_status',)
-    list_filter = ('release_status', )
+    list_display = ('title', 'release_date', 'release_status', 'get_translated')
+    list_filter = ('release_status', 'info__translated', 'release_date')
+
+    def get_translated(self, obj):
+        return obj.info.translated
+
 
 
 from .forms import VideoForm
